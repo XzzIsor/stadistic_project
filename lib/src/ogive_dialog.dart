@@ -4,12 +4,11 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:stadistic/src/data_controller.dart';
 
-class HistogramDialog {
+class OgiveDialog {
   DataController controller = DataController();
   Color barColor = Color.fromRGBO(
       Random().nextInt(250), Random().nextInt(250), Random().nextInt(250), 1);
-
-  Future<void> showHistogramDialog(BuildContext context) async {
+  Future<void> showOgiveDialog(BuildContext context) async {
     Size size = MediaQuery.of(context).size;
 
     return showDialog<void>(
@@ -17,13 +16,13 @@ class HistogramDialog {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: Colors.transparent,
-            content: _histogramContainer(size),
+            content: _ogiveContainer(size),
             elevation: 24,
           );
         });
   }
 
-  Widget _histogramContainer(Size size) {
+  Widget _ogiveContainer(Size size) {
     return Container(
       height: size.height * 0.85,
       width: size.width * 0.9,
@@ -38,16 +37,19 @@ class HistogramDialog {
         borderRadius: BorderRadius.circular(25),
         color: const Color.fromARGB(255, 152, 214, 223),
       ),
-      child: _histogram(size),
+      child: _ogive(size),
     );
   }
 
-  Widget _histogram(Size size) {
-    List<double> data = controller.data;
-    List<ChartData> chartData = [];
-    for (int i = 0; i < data.length; i++) {
-      chartData.add(ChartData(
-          data[i],
+  Widget _ogive(Size size) {
+    List<double> axisX = controller.dataList.map((e) => e.li).toList();
+    List<double> axisY = controller.ogiveData;
+    List<ChartData> data = [];
+
+    for (int i = 0; i < axisX.length; i++) {
+      data.add(ChartData(
+          axisY[i],
+          axisX[i],
           Color.fromRGBO(Random().nextInt(250), Random().nextInt(250),
               Random().nextInt(250), 1)));
     }
@@ -57,17 +59,15 @@ class HistogramDialog {
       width: size.width * 0.7,
       child: SfCartesianChart(
         series: <ChartSeries>[
-          HistogramSeries<ChartData, double>(
-              dataSource: chartData,
-              yValueMapper: (data, int i) => data.y,
-              borderColor: Colors.black,
+          SplineSeries<ChartData, double>(
+              dataSource: data,
+              yValueMapper: (data, _) => data.y,
+              xValueMapper: (data, _) => data.x,
+              pointColorMapper: (data, _) => data.color,
               xAxisName: 'Intervalos',
               yAxisName: 'Frecuencias',
-              pointColorMapper: (data, int i) => data.color,
               animationDuration: 4000,
-              showNormalDistributionCurve: true,
-              curveColor: const Color.fromRGBO(0, 0, 0, 1),
-              borderWidth: 3),
+              width: 4),
         ],
       ),
     );
@@ -75,7 +75,8 @@ class HistogramDialog {
 }
 
 class ChartData {
-  ChartData(this.y, this.color);
+  ChartData(this.y, this.x, this.color);
+  final double x;
   final double y;
   final Color color;
 }

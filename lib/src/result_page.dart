@@ -1,6 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+
+import 'package:stadistic/src/data.dart';
+import 'package:stadistic/src/data_controller.dart';
 import 'package:stadistic/src/histogram_dialog.dart';
-import 'package:stadistic/src/ojiva_dialog.dart';
+import 'package:stadistic/src/ogive_dialog.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage({Key? key}) : super(key: key);
@@ -10,10 +15,25 @@ class ResultPage extends StatefulWidget {
 }
 
 class _ResultPageState extends State<ResultPage> {
+  DataController controller = DataController();
   List<TableRow> rows = [];
+  List<Data> dataRows = [];
+  String messageTche = '';
+  @override
+  void initState() {
+    dataRows = controller.dataList;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    dataRows.clear();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    rows.clear();
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -77,8 +97,10 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   Widget _table(Size size) {
-    rows.add(_tableRows(size));
-    rows.add(_tableRows(size));
+    rows.add(_tableTitleRow(size));
+    for (int i = 0; i < dataRows.length; i++) {
+      rows.add(_tableRows(size, dataRows[i], i + 1));
+    }
 
     return SizedBox(
         child: Table(
@@ -87,7 +109,7 @@ class _ResultPageState extends State<ResultPage> {
     ));
   }
 
-  TableRow _tableRows(Size size) {
+  TableRow _tableTitleRow(Size size) {
     int number = 10;
     return TableRow(children: [
       _row(size, '#', number),
@@ -98,6 +120,20 @@ class _ResultPageState extends State<ResultPage> {
       _row(size, 'fi', number),
       _row(size, 'Ni', number),
       _row(size, 'Fi', number),
+    ]);
+  }
+
+  TableRow _tableRows(Size size, Data data, int index) {
+    int number = 10;
+    return TableRow(children: [
+      _row(size, '$index', number),
+      _row(size, data.li1.toStringAsFixed(2), number),
+      _row(size, data.li.toStringAsFixed(2), number),
+      _row(size, data.xi!.toStringAsFixed(2), number),
+      _row(size, data.ni.toStringAsFixed(2), number),
+      _row(size, data.fi.toStringAsFixed(2), number),
+      _row(size, data.Ni!.toStringAsFixed(2), number),
+      _row(size, data.Fi!.toStringAsFixed(2), number),
     ]);
   }
 
@@ -128,13 +164,13 @@ class _ResultPageState extends State<ResultPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text('Media:    85',
+              Text('Media:    ${controller.aritmeticMean.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
-              Text('Mediana:    25',
+              Text('Mediana:    ${controller.median.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
-              Text('Moda:    35',
+              Text('Moda:    ${controller.trend.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
             ],
@@ -160,19 +196,21 @@ class _ResultPageState extends State<ResultPage> {
               SizedBox(
                 width: size.width * 0.17,
               ),
-              Text('Varianza:    85',
+              Text('Varianza:    ${controller.variance.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
               SizedBox(
                 width: size.width * 0.15,
               ),
-              Text('Desviación Estándar:    25',
+              Text(
+                  'Desviación Estándar:    ${controller.standardDeviation.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
               SizedBox(
                 width: size.width * 0.11,
               ),
-              Text('Coeficiente de Variación:    35',
+              Text(
+                  'Coeficiente de Variación:    ${controller.coefficientOfVariation.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
             ],
@@ -211,7 +249,7 @@ class _ResultPageState extends State<ResultPage> {
             HistogramDialog().showHistogramDialog(context);
           }),
           _dialogButton(size, 'Ojiva', () {
-            OjivaDialog().showOjivaDialog(context);
+            OgiveDialog().showOgiveDialog(context);
           }),
         ],
       ),
@@ -261,7 +299,15 @@ class _ResultPageState extends State<ResultPage> {
                   width: size.width * 0.03,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() {
+                      double result = 1 - 1 / pow(2, double.parse(kValue));
+                      double response =
+                          controller.getTchebycheff(int.parse(kValue));
+                      messageTche =
+                          'El resultado es: ${response.toStringAsFixed(2)} >= ${result.toStringAsFixed(2)}';
+                    });
+                  },
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.all(size.aspectRatio * 9),
                     elevation: size.aspectRatio * 5,
@@ -276,7 +322,15 @@ class _ResultPageState extends State<ResultPage> {
                           color: Colors.white)),
                 ),
               ],
-            )
+            ),
+            SizedBox(
+              height: size.height * 0.02,
+            ),
+            Center(
+              child: Text(messageTche,
+                  style: TextStyle(
+                      fontSize: size.aspectRatio * 10, color: Colors.black)),
+            ),
           ],
         ),
       ),
