@@ -88,7 +88,7 @@ class _ResultPageState extends State<ResultPage> {
               SizedBox(
                 height: size.height * 0.07,
               ),
-              _tchebycheff(size)
+              controller.isDiscrete ? Container() : _tchebycheff(size)
             ],
           ),
         ),
@@ -111,30 +111,48 @@ class _ResultPageState extends State<ResultPage> {
 
   TableRow _tableTitleRow(Size size) {
     int number = 10;
-    return TableRow(children: [
-      _row(size, '#', number),
-      _row(size, 'Li-1', number),
-      _row(size, 'Li', number),
-      _row(size, 'xi', number),
-      _row(size, 'ni', number),
-      _row(size, 'fi', number),
-      _row(size, 'Ni', number),
-      _row(size, 'Fi', number),
-    ]);
+    return !controller.isDiscrete
+        ? TableRow(children: [
+            _row(size, '#', number),
+            _row(size, 'Li-1', number),
+            _row(size, 'Li', number),
+            _row(size, 'xi', number),
+            _row(size, 'ni', number),
+            _row(size, 'fi', number),
+            _row(size, 'Ni', number),
+            _row(size, 'Fi', number),
+          ])
+        : TableRow(children: [
+            _row(size, '#', number),
+            _row(size, 'Xi', number),
+            _row(size, 'ni', number),
+            _row(size, 'fi', number),
+            _row(size, 'Ni', number),
+            _row(size, 'Fi', number),
+          ]);
   }
 
   TableRow _tableRows(Size size, Data data, int index) {
     int number = 10;
-    return TableRow(children: [
-      _row(size, '$index', number),
-      _row(size, data.li1.toStringAsFixed(2), number),
-      _row(size, data.li.toStringAsFixed(2), number),
-      _row(size, data.xi!.toStringAsFixed(2), number),
-      _row(size, data.ni.toStringAsFixed(2), number),
-      _row(size, data.fi.toStringAsFixed(2), number),
-      _row(size, data.Ni!.toStringAsFixed(2), number),
-      _row(size, data.Fi!.toStringAsFixed(2), number),
-    ]);
+    return !controller.isDiscrete
+        ? TableRow(children: [
+            _row(size, '$index', number),
+            _row(size, data.li1!.toStringAsFixed(2), number),
+            _row(size, data.li!.toStringAsFixed(2), number),
+            _row(size, data.xi!.toStringAsFixed(2), number),
+            _row(size, data.ni.toStringAsFixed(2), number),
+            _row(size, data.fi.toStringAsFixed(2), number),
+            _row(size, data.Ni!.toStringAsFixed(2), number),
+            _row(size, data.Fi!.toStringAsFixed(2), number),
+          ])
+        : TableRow(children: [
+            _row(size, '$index', number),
+            _row(size, data.li!.toStringAsFixed(2), number),
+            _row(size, data.ni.toStringAsFixed(2), number),
+            _row(size, data.fi.toStringAsFixed(2), number),
+            _row(size, data.Ni!.toStringAsFixed(2), number),
+            _row(size, data.Fi!.toStringAsFixed(2), number)
+          ]);
   }
 
   Widget _row(Size size, String message, int fontSize) {

@@ -13,6 +13,7 @@ class _MainPageState extends State<MainPage> {
   bool isContinuesCheck = false;
   String data = '';
   DataController controller = DataController();
+  String errorMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +61,13 @@ class _MainPageState extends State<MainPage> {
               SizedBox(
                 height: size.height * 0.4,
               ),
+              Text(errorMessage,
+                  style: TextStyle(
+                      color: const Color.fromARGB(255, 175, 20, 9),
+                      fontSize: size.aspectRatio * 12)),
+              SizedBox(
+                height: size.height * 0.05,
+              ),
               _button(size)
             ],
           ),
@@ -78,7 +86,7 @@ class _MainPageState extends State<MainPage> {
           height: size.height * 0.02,
         ),
         SizedBox(
-            width: size.width * 0.7,
+            width: size.width * 0.8,
             child: TextField(
               onChanged: ((value) {
                 setState(() {
@@ -153,8 +161,15 @@ class _MainPageState extends State<MainPage> {
         onPressed: () {
           controller.dataString = data;
           controller.isDiscrete = isDiscretCheck;
-          controller.makeData();
-          Navigator.pushNamed(context, '/result');
+          try {
+            controller.makeData();
+            Navigator.pushNamed(context, '/result');
+          } catch (e) {
+            setState(() {
+              errorMessage =
+                  'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
+            });
+          }
         },
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.all(size.aspectRatio * 12),

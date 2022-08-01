@@ -1,6 +1,6 @@
 class Data {
-  double li1;
-  double li;
+  double? li1;
+  double? li;
   double ni;
   double fi;
   double? xi;
@@ -8,8 +8,8 @@ class Data {
   double? Fi;
 
   Data({
-    required this.li1,
-    required this.li,
+    this.li1,
+    this.li,
     required this.ni,
     required this.fi,
     this.xi,

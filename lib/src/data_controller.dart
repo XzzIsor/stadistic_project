@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:stadistic/main.dart';
 import 'package:stadistic/src/data.dart';
 
 class DataController {
@@ -11,6 +12,7 @@ class DataController {
   static double _max = 0.0;
   static double _range = 0;
   static double _cValue = 0;
+  static List<double> _cValues = [];
   static double _m = 0;
   static double _aritmeticMean = 0;
   static double _median = 0;
@@ -19,6 +21,7 @@ class DataController {
   static double _standardDeviation = 0;
   static double _coefficientOfVariation = 0;
   static List<double> _ogiveData = [];
+  static List<double> _intervals = [];
   String _dataString = '';
 
   set isDiscrete(bool value) {
@@ -27,6 +30,10 @@ class DataController {
 
   set dataString(String value) {
     _dataString = value;
+  }
+
+  set data(List<double> value) {
+    _data = value;
   }
 
   List<Data> get dataList => _dataList;
@@ -40,14 +47,21 @@ class DataController {
   double get standardDeviation => _standardDeviation;
   double get coefficientOfVariation => _coefficientOfVariation;
   double get cValue => _cValue;
+  bool get isDiscrete => _isDiscrete;
 
   void makeData() {
     final aux = _dataString.split(',');
     _data = aux.map((e) => double.parse(e)).toList();
     _lenghtN = _data.length;
-    _getRange();
-    _getCValue();
-    _isDiscrete ? _organizeDiscretData() : _organizeContinuousData();
+
+    if (!_isDiscrete) {
+      _getRange();
+      _getCValue();
+      _organizeContinuosData();
+    } else {
+      _getCValues();
+      _organizeDiscreteData();
+    }
     _getCentralTendency();
     _getDispersion();
     _getGraphicsData();
@@ -81,7 +95,15 @@ class DataController {
     _cValue = _range / _m;
   }
 
-  void _organizeDiscretData() {
+  void _getCValues() {
+    _intervals = _data.map((e) => e).toSet().toList();
+    _intervals.sort();
+    for (int i = 0; i < _intervals.length - 1; i++) {
+      _cValues.add(_intervals[i + 1] - _intervals[i]);
+    }
+  }
+
+  void _organizeContinuosData() {
     double superiorLimit = _min + _cValue;
     double inferiorLimit = _min;
     double counter = 0;
@@ -121,8 +143,36 @@ class DataController {
     }
   }
 
-  void _organizeContinuousData() {
-    //TODO: Hacer esta madre
+  void _organizeDiscreteData() {
+    double counter = 0;
+
+    for (int i = 0; i < _intervals.length; i++) {
+      for (int j = 0; j < _data.length; j++) {
+        if (_data[j] == _intervals[i]) {
+          counter++;
+        }
+      }
+
+      Data data = Data(li1: 0, li: 0, ni: 0, fi: 0, Ni: 0, Fi: 0, xi: 0);
+      if (i == 0) {
+        data = Data(
+            li: _intervals[i],
+            ni: counter,
+            fi: counter / _lenghtN,
+            Ni: counter,
+            Fi: counter / _lenghtN);
+      } else {
+        data = Data(
+            li: _intervals[i],
+            ni: counter,
+            fi: counter / _lenghtN,
+            Ni: counter + _dataList[i - 1].Ni!,
+            Fi: (counter / _lenghtN) + _dataList[i - 1].Fi!);
+      }
+
+      counter = 0;
+      _dataList.add(data);
+    }
   }
 
   void _getAritmeticMean() {
@@ -147,13 +197,27 @@ class DataController {
         mainIndex = i;
       }
     }
-
-    double num1 = (_dataList[mainIndex].fi / _cValue);
-    double num2 = mainIndex != 0 ? (_dataList[mainIndex - 1].fi / _cValue) : 0;
-    double num3 =
-        mainIndex != _m - 1 ? (_dataList[mainIndex + 1].fi / _cValue) : 0;
-    double num4 = _dataList[mainIndex].li1;
-    _trend = (((num1 - num2) / 2 * (num1 - num2 - num3)) * _cValue) + num4;
+    if (_isDiscrete) {
+      double num1 = (_dataList[mainIndex].fi / _cValues[mainIndex]);
+      double num2 = mainIndex != 0
+          ? (_dataList[mainIndex - 1].fi / _cValues[mainIndex - 1])
+          : 0;
+      double num3 = mainIndex != _m - 1
+          ? (_dataList[mainIndex + 1].fi / _cValues[mainIndex + 1])
+          : 0;
+      double num4 = _dataList[mainIndex].li!;
+      _trend =
+          (((num1 - num2) / 2 * (num1 - num2 - num3)) * _cValues[mainIndex]) +
+              num4;
+    } else {
+      double num1 = (_dataList[mainIndex].fi / _cValue);
+      double num2 =
+          mainIndex != 0 ? (_dataList[mainIndex - 1].fi / _cValue) : 0;
+      double num3 =
+          mainIndex != _m - 1 ? (_dataList[mainIndex + 1].fi / _cValue) : 0;
+      double num4 = _dataList[mainIndex].li1!;
+      _trend = (((num1 - num2) / 2 * (num1 - num2 - num3)) * _cValue) + num4;
+    }
   }
 
   void _getCentralTendency() {
@@ -191,24 +255,26 @@ class DataController {
     int indexMax = 1;
 
     for (int i = 0; i < _dataList.length; i++) {
-      if (valueMin >= _dataList[i].li1 && valueMin < _dataList[i].li) {
+      if (valueMin >= _dataList[i].li1! && valueMin < _dataList[i].li!) {
         indexMin = i;
       }
     }
 
     for (int i = 0; i < _dataList.length; i++) {
-      if (valueMax >= _dataList[i].li1 && valueMax < _dataList[i].li) {
+      if (valueMax >= _dataList[i].li1! && valueMax < _dataList[i].li!) {
         indexMax = i;
       }
     }
 
+    double result = 0;
+
     double operation1 = (_dataList[indexMin].fi / _cValue) +
         ((_dataList[indexMin].Ni! / _cValue) *
-            (valueMin - _dataList[indexMin].li1));
+            (valueMin - _dataList[indexMin].li1!));
     double operation2 = (_dataList[indexMax].fi / _cValue) +
         ((_dataList[indexMax].Ni! / _cValue) *
-            (valueMax - _dataList[indexMax].li1));
-    double result = operation2 - operation1;
+            (valueMax - _dataList[indexMax].li1!));
+    result = operation2 - operation1;
 
     return result;
   }

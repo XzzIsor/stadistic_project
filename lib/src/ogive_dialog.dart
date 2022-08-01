@@ -35,14 +35,14 @@ class OgiveDialog {
           ),
         ],
         borderRadius: BorderRadius.circular(25),
-        color: const Color.fromARGB(255, 152, 214, 223),
+        color: const Color.fromARGB(255, 169, 208, 214),
       ),
       child: _ogive(size),
     );
   }
 
   Widget _ogive(Size size) {
-    List<double> axisX = controller.dataList.map((e) => e.li).toList();
+    List<double> axisX = controller.dataList.map((e) => e.li!).toList();
     List<double> axisY = controller.ogiveData;
     List<ChartData> data = [];
 
