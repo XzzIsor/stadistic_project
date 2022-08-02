@@ -252,10 +252,10 @@ class DataController {
   }
 
   double getTchebycheff(int k) {
-    double valueMin = _aritmeticMean - (2 * _standardDeviation);
-    double valueMax = _aritmeticMean + (2 * _standardDeviation);
-    int indexMin = 0;
-    int indexMax = 1;
+    double valueMin = _aritmeticMean - (k * _standardDeviation);
+    double valueMax = _aritmeticMean + (k * _standardDeviation);
+    int indexMin = -1;
+    int indexMax = -1;
 
     for (int i = 0; i < _dataList.length; i++) {
       if (valueMin >= _dataList[i].li1! && valueMin < _dataList[i].li!) {
@@ -270,13 +270,28 @@ class DataController {
     }
 
     double result = 0;
+    double operation1 = 0;
+    double operation2 = 0;
 
-    double operation1 = (_dataList[indexMin].fi / _cValue) +
-        ((_dataList[indexMin].Ni! / _cValue) *
-            (valueMin - _dataList[indexMin].li1!));
-    double operation2 = (_dataList[indexMax].fi / _cValue) +
-        ((_dataList[indexMax].Ni! / _cValue) *
-            (valueMax - _dataList[indexMax].li1!));
+    if (indexMin == 0) {
+      operation1 = (_dataList[indexMin].fi / cValue) *
+          (valueMin - _dataList[indexMin].li1!);
+    } else if (indexMin == -1) {
+      operation1 = 0;
+    } else {
+      operation1 = _dataList[indexMin - 1].Fi! +
+          ((_dataList[indexMin].fi / cValue) *
+              (valueMin - _dataList[indexMin - 1].li1!));
+    }
+
+    if (indexMax == -1) {
+      operation2 = 1;
+    } else {
+      operation2 = _dataList[indexMax - 1].Fi! +
+          ((_dataList[indexMax].fi / cValue) *
+              (valueMax - _dataList[indexMax].li1!));
+    }
+
     result = operation2 - operation1;
 
     return result;

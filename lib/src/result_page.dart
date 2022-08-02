@@ -319,7 +319,8 @@ class _ResultPageState extends State<ResultPage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      double result = 1 - 1 / pow(2, double.parse(kValue));
+                      int divisor = int.parse(kValue) * int.parse(kValue);
+                      double result = 1 - (1 / divisor);
                       double response =
                           controller.getTchebycheff(int.parse(kValue));
                       messageTche =
