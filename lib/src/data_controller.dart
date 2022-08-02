@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:stadistic/main.dart';
 import 'package:stadistic/src/data.dart';
 
 class DataController {
@@ -21,6 +20,7 @@ class DataController {
   static double _standardDeviation = 0;
   static double _coefficientOfVariation = 0;
   static List<double> _ogiveData = [];
+  static List<double> _histogramData = [];
   static List<double> _intervals = [];
   String _dataString = '';
 
@@ -38,6 +38,7 @@ class DataController {
 
   List<Data> get dataList => _dataList;
   List<double> get ogiveData => _ogiveData;
+  List<double> get histogramData => _histogramData;
   List<double> get data => _data;
 
   double get aritmeticMean => _aritmeticMean;
@@ -50,6 +51,8 @@ class DataController {
   bool get isDiscrete => _isDiscrete;
 
   void makeData() {
+    _data.clear();
+    _dataList.clear();
     final aux = _dataString.split(',');
     _data = aux.map((e) => double.parse(e)).toList();
     _lenghtN = _data.length;
@@ -202,7 +205,7 @@ class DataController {
       double num2 = mainIndex != 0
           ? (_dataList[mainIndex - 1].fi / _cValues[mainIndex - 1])
           : 0;
-      double num3 = mainIndex != _m - 1
+      double num3 = mainIndex != _intervals.length - 1
           ? (_dataList[mainIndex + 1].fi / _cValues[mainIndex + 1])
           : 0;
       double num4 = _dataList[mainIndex].li!;

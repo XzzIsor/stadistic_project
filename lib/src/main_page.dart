@@ -166,6 +166,7 @@ class _MainPageState extends State<MainPage> {
             Navigator.pushNamed(context, '/result');
           } catch (e) {
             setState(() {
+              print(e);
               errorMessage =
                   'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
             });
