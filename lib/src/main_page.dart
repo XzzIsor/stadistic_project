@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stadistic/src/cvalues_dialog.dart';
 import 'package:stadistic/src/data_controller.dart';
 
 class MainPage extends StatefulWidget {
@@ -11,6 +12,8 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool isDiscretCheck = true;
   bool isContinuesCheck = false;
+  bool cValues = false;
+  bool showCheck = false;
   String data = '';
   DataController controller = DataController();
   String errorMessage = '';
@@ -23,50 +26,56 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: const Color.fromARGB(255, 38, 159, 175),
         title: Center(
             child: Text(
-          'Ingresar Datos',
-          style: TextStyle(fontSize: size.aspectRatio * 13),
+          'Calculadora Estadistica',
+          style: TextStyle(fontSize: size.aspectRatio * 16),
         )),
       ),
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(size.aspectRatio * 15),
+          padding: EdgeInsets.all(size.aspectRatio * 11),
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: size.aspectRatio * 6,
-                spreadRadius: size.aspectRatio * 2,
-              ),
-            ],
-            borderRadius: BorderRadius.circular(25),
-            color: const Color.fromARGB(255, 152, 214, 223),
-          ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: size.aspectRatio * 6,
+                  spreadRadius: size.aspectRatio * 2,
+                ),
+              ],
+              borderRadius: BorderRadius.circular(25),
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 38, 159, 175),
+                  Color.fromARGB(255, 152, 214, 223),
+                ],
+                begin: FractionalOffset(0, 0),
+                end: FractionalOffset(0.6, 0.4),
+              )),
           height: size.height * 0.85,
           width: size.width * 0.9,
           child: Column(
             children: [
-              Text(
-                'Selecione el tipo de datos',
-                style: TextStyle(
-                    color: Colors.black, fontSize: size.aspectRatio * 12),
-              ),
+              _columnCheckBoxes(size),
               SizedBox(
-                height: size.height * 0.02,
-              ),
-              _rowCheckBoxes(size),
-              SizedBox(
-                height: size.height * 0.05,
+                height: size.height * 0.04,
               ),
               _dataTextField(size),
               SizedBox(
-                height: size.height * 0.4,
+                height: size.height * 0.01,
+              ),
+              showCheck ? _cValuesCheckBox(size) : Container(),
+              SizedBox(
+                height: size.height * 0.02,
+              ),
+              _infoBox(size),
+              SizedBox(
+                height: size.height * 0.05,
               ),
               Text(errorMessage,
                   style: TextStyle(
                       color: const Color.fromARGB(255, 175, 20, 9),
                       fontSize: size.aspectRatio * 12)),
               SizedBox(
-                height: size.height * 0.05,
+                height: size.height * 0.02,
               ),
               _button(size)
             ],
@@ -88,6 +97,8 @@ class _MainPageState extends State<MainPage> {
         SizedBox(
             width: size.width * 0.8,
             child: TextField(
+              keyboardType: TextInputType.multiline,
+              maxLines: 5,
               onChanged: ((value) {
                 setState(() {
                   data = value;
@@ -101,7 +112,8 @@ class _MainPageState extends State<MainPage> {
                 label: Text('Datos',
                     style: TextStyle(
                         color: Colors.black, fontSize: size.aspectRatio * 10)),
-                counterText: 'Ingrese los datos separadas por comas',
+                counterText: 'Ingrese los datos separados por comas',
+                hintText: 'Ej: 1,2,3,4,5,6',
                 counterStyle: TextStyle(fontSize: size.aspectRatio * 8),
               ),
             )),
@@ -109,50 +121,65 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _rowCheckBoxes(Size size) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          children: [
-            Checkbox(
-                value: isDiscretCheck,
-                onChanged: (value) {
-                  setState(() {
-                    isDiscretCheck = !isDiscretCheck;
-                    isContinuesCheck = !isContinuesCheck;
-                  });
-                }),
-            SizedBox(width: size.width * 0.005),
-            Text(
-              'Variables Discretas',
-              style: TextStyle(
-                  color: Colors.black, fontSize: size.aspectRatio * 10),
-            )
-          ],
-        ),
-        SizedBox(
-          width: size.width * 0.05,
-        ),
-        Row(
-          children: [
-            Checkbox(
-                value: isContinuesCheck,
-                onChanged: (value) {
-                  setState(() {
-                    isDiscretCheck = !isDiscretCheck;
-                    isContinuesCheck = !isContinuesCheck;
-                  });
-                }),
-            SizedBox(width: size.width * 0.005),
-            Text(
-              'Variables Continuas',
-              style: TextStyle(
-                  color: Colors.black, fontSize: size.aspectRatio * 10),
-            )
-          ],
-        ),
-      ],
+  Widget _columnCheckBoxes(Size size) {
+    return SizedBox(
+      height: size.height * 0.1,
+      child: Column(
+        children: [
+          Text(
+            'Seleccione el tipo de datos: ',
+            style:
+                TextStyle(color: Colors.black, fontSize: size.aspectRatio * 12),
+          ),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                  value: isDiscretCheck,
+                  onChanged: (value) {
+                    setState(() {
+                      cValues = false;
+                      showCheck = false;
+                      isDiscretCheck = true;
+                      isContinuesCheck = false;
+                    });
+                  }),
+              SizedBox(width: size.width * 0.005),
+              Text(
+                'Variables Discretas',
+                style: TextStyle(
+                    color: Colors.black, fontSize: size.aspectRatio * 10),
+              )
+            ],
+          ),
+          SizedBox(
+            width: size.width * 0.05,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Checkbox(
+                  value: isContinuesCheck,
+                  onChanged: (value) {
+                    setState(() {
+                      showCheck = true;
+                      isDiscretCheck = false;
+                      isContinuesCheck = true;
+                    });
+                  }),
+              SizedBox(width: size.width * 0.005),
+              Text(
+                'Variables Continuas',
+                style: TextStyle(
+                    color: Colors.black, fontSize: size.aspectRatio * 10),
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -161,15 +188,20 @@ class _MainPageState extends State<MainPage> {
         onPressed: () {
           controller.dataString = data;
           controller.isDiscrete = isDiscretCheck;
-          try {
+
+          if (!cValues) {
+            try {
+              controller.makeData();
+              Navigator.pushNamed(context, '/result');
+            } catch (e) {
+              setState(() {
+                errorMessage =
+                    'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
+              });
+            }
+          } else {
             controller.makeData();
-            Navigator.pushNamed(context, '/result');
-          } catch (e) {
-            setState(() {
-              print(e);
-              errorMessage =
-                  'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
-            });
+            CValuesDialog().showCValuesDialog(context);
           }
         },
         style: ElevatedButton.styleFrom(
@@ -185,5 +217,108 @@ class _MainPageState extends State<MainPage> {
           style:
               TextStyle(color: Colors.white, fontSize: size.aspectRatio * 15),
         ));
+  }
+
+  Widget _cValuesCheckBox(Size size) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Checkbox(
+            activeColor: Colors.green[900],
+            value: cValues,
+            onChanged: (value) {
+              setState(() {
+                cValues = !cValues;
+              });
+            }),
+        SizedBox(width: size.width * 0.005),
+        Text(
+          '¿Ingresar Amplitudes?',
+          style: TextStyle(
+              color: Colors.green[900], fontSize: size.aspectRatio * 10),
+        )
+      ],
+    );
+  }
+
+  Widget _infoBox(Size size) {
+    return SizedBox(
+      height: size.height * 0.12,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'Cálculos: ',
+            style:
+                TextStyle(color: Colors.black, fontSize: size.aspectRatio * 12),
+          ),
+          SizedBox(
+            height: size.height * 0.01,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    'Media Aritmética',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Mediana',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Moda',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    'Varianza',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Desviación Estándar',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Coeficiente de Variación',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    'Histograma',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Ojiva',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                  Text(
+                    'Principio de Tchebycheff',
+                    style: TextStyle(
+                        color: Colors.black, fontSize: size.aspectRatio * 10),
+                  ),
+                ],
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

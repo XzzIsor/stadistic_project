@@ -6,14 +6,15 @@ class Data {
   double? xi;
   double? Ni;
   double? Fi;
+  double ci;
 
-  Data({
-    this.li1,
-    this.li,
-    required this.ni,
-    required this.fi,
-    this.xi,
-    this.Ni,
-    this.Fi,
-  });
+  Data(
+      {this.li1,
+      this.li,
+      required this.ni,
+      required this.fi,
+      this.xi,
+      this.Ni,
+      this.Fi,
+      required this.ci});
 }

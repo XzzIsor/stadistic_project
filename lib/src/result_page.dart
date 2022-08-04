@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:stadistic/src/data.dart';
 import 'package:stadistic/src/data_controller.dart';
+import 'package:stadistic/src/frecuency_dialog.dart';
 import 'package:stadistic/src/histogram_dialog.dart';
 import 'package:stadistic/src/ogive_dialog.dart';
 
@@ -41,23 +42,29 @@ class _ResultPageState extends State<ResultPage> {
         title: Center(
             child: Text(
           'Resultados',
-          style: TextStyle(fontSize: size.aspectRatio * 13),
+          style: TextStyle(fontSize: size.aspectRatio * 16),
         )),
       ),
       body: Center(
         child: Container(
           padding: EdgeInsets.all(size.aspectRatio * 15),
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black54,
-                blurRadius: size.aspectRatio * 6,
-                spreadRadius: size.aspectRatio * 2,
-              ),
-            ],
-            borderRadius: BorderRadius.circular(25),
-            color: const Color.fromARGB(255, 152, 214, 223),
-          ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: size.aspectRatio * 6,
+                  spreadRadius: size.aspectRatio * 2,
+                ),
+              ],
+              borderRadius: BorderRadius.circular(25),
+              gradient: const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 38, 159, 175),
+                  Color.fromARGB(255, 152, 214, 223),
+                ],
+                begin: FractionalOffset(0, 0),
+                end: FractionalOffset(0.6, 0.4),
+              )),
           height: size.height * 0.85,
           width: size.width * 0.9,
           child: ListView(
@@ -76,13 +83,9 @@ class _ResultPageState extends State<ResultPage> {
               SizedBox(
                 height: size.height * 0.05,
               ),
-              _rowInfo1(size),
+              _rowInfo(size),
               SizedBox(
-                height: size.height * 0.06,
-              ),
-              _rowInfo2(size),
-              SizedBox(
-                height: size.height * 0.09,
+                height: size.height * 0.03,
               ),
               _buttonsRow(size),
               SizedBox(
@@ -117,6 +120,7 @@ class _ResultPageState extends State<ResultPage> {
             _row(size, 'Li-1', number),
             _row(size, 'Li', number),
             _row(size, 'xi', number),
+            _row(size, 'ci', number),
             _row(size, 'ni', number),
             _row(size, 'fi', number),
             _row(size, 'Ni', number),
@@ -125,6 +129,7 @@ class _ResultPageState extends State<ResultPage> {
         : TableRow(children: [
             _row(size, '#', number),
             _row(size, 'Xi', number),
+            _row(size, 'ci', number),
             _row(size, 'ni', number),
             _row(size, 'fi', number),
             _row(size, 'Ni', number),
@@ -140,6 +145,7 @@ class _ResultPageState extends State<ResultPage> {
             _row(size, data.li1!.toStringAsFixed(2), number),
             _row(size, data.li!.toStringAsFixed(2), number),
             _row(size, data.xi!.toStringAsFixed(2), number),
+            _row(size, data.ci.toStringAsFixed(2), number),
             _row(size, data.ni.toStringAsFixed(2), number),
             _row(size, data.fi.toStringAsFixed(2), number),
             _row(size, data.Ni!.toStringAsFixed(2), number),
@@ -148,6 +154,7 @@ class _ResultPageState extends State<ResultPage> {
         : TableRow(children: [
             _row(size, '$index', number),
             _row(size, data.li!.toStringAsFixed(2), number),
+            _row(size, data.ci.toStringAsFixed(2), number),
             _row(size, data.ni.toStringAsFixed(2), number),
             _row(size, data.fi.toStringAsFixed(2), number),
             _row(size, data.Ni!.toStringAsFixed(2), number),
@@ -168,9 +175,8 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  Widget _rowInfo1(Size size) {
+  Widget _columnInfo1(Size size) {
     return SizedBox(
-      width: size.width * 0.7,
       child: Column(
         children: [
           Text('Indicadores de Tendencia Central',
@@ -179,8 +185,7 @@ class _ResultPageState extends State<ResultPage> {
           SizedBox(
             height: size.height * 0.02,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
             children: [
               Text('Media:    ${controller.aritmeticMean.toStringAsFixed(2)}',
                   style: TextStyle(
@@ -198,9 +203,8 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  Widget _rowInfo2(Size size) {
+  Widget _columnInfo2(Size size) {
     return SizedBox(
-      width: size.width * 0.7,
       child: Column(
         children: [
           Text('Indicadores de Dispersión',
@@ -209,30 +213,34 @@ class _ResultPageState extends State<ResultPage> {
           SizedBox(
             height: size.height * 0.02,
           ),
-          Row(
+          Column(
             children: [
-              SizedBox(
-                width: size.width * 0.17,
-              ),
               Text('Varianza:    ${controller.variance.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
-              SizedBox(
-                width: size.width * 0.15,
-              ),
               Text(
                   'Desviación Estándar:    ${controller.standardDeviation.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
-              SizedBox(
-                width: size.width * 0.11,
-              ),
               Text(
                   'Coeficiente de Variación:    ${controller.coefficientOfVariation.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _rowInfo(Size size) {
+    return SizedBox(
+      height: size.height * 0.15,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _columnInfo1(size),
+          _columnInfo2(size),
         ],
       ),
     );
@@ -268,6 +276,9 @@ class _ResultPageState extends State<ResultPage> {
           }),
           _dialogButton(size, 'Ojiva', () {
             OgiveDialog().showOgiveDialog(context);
+          }),
+          _dialogButton(size, 'Poligono Frecuencias', () {
+            FrecuencyDialog().showFrecuencyDialog(context);
           }),
         ],
       ),

@@ -1,12 +1,14 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:stadistic/src/data_controller.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import 'package:stadistic/src/data_controller.dart';
-
-class OgiveDialog {
+class FrecuencyDialog {
   DataController controller = DataController();
-  Future<void> showOgiveDialog(BuildContext context) async {
+  Color barColor = Color.fromRGBO(
+      Random().nextInt(250), Random().nextInt(250), Random().nextInt(250), 1);
+  Future<void> showFrecuencyDialog(BuildContext context) async {
     Size size = MediaQuery.of(context).size;
 
     return showDialog<void>(
@@ -14,16 +16,16 @@ class OgiveDialog {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: Colors.transparent,
-            content: _ogiveContainer(size),
+            content: _frecuencyContainer(size),
             elevation: 24,
           );
         });
   }
 
-  Widget _ogiveContainer(Size size) {
+  Widget _frecuencyContainer(Size size) {
     return Container(
-      height: size.height,
-      width: size.width,
+      height: size.height * 0.85,
+      width: size.width * 0.85,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -35,15 +37,15 @@ class OgiveDialog {
         borderRadius: BorderRadius.circular(25),
         color: Colors.white,
       ),
-      child: _ogive(size),
+      child: _frecuency(size),
     );
   }
 
-  Widget _ogive(Size size) {
+  Widget _frecuency(Size size) {
     List<double> axisX = controller.dataList.map((e) => e.li1!).toList();
     axisX.add(controller.dataList.last.li!);
-    List<double> axisY = controller.ogiveData;
-    axisY.add(100);
+    List<double> axisY = controller.frecuencyData;
+    axisY.add(0);
     List<ChartData> data = [];
     data.add(ChartData(
         0,
@@ -59,11 +61,11 @@ class OgiveDialog {
     }
 
     return SizedBox(
-      height: size.height,
-      width: size.width,
+      height: size.height * 0.6,
+      width: size.width * 0.7,
       child: SfCartesianChart(
         series: <ChartSeries>[
-          SplineSeries<ChartData, double>(
+          LineSeries<ChartData, double>(
               markerSettings: const MarkerSettings(
                   isVisible: true,
                   shape: DataMarkerType.circle,
