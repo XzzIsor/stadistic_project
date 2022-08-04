@@ -1,15 +1,16 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:stadistic/src/data.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:stadistic/src/data_controller.dart';
 
-class HistogramDialog {
+class ColumnDialog {
   DataController controller = DataController();
   Color barColor = Color.fromRGBO(
       Random().nextInt(250), Random().nextInt(250), Random().nextInt(250), 1);
 
-  Future<void> showHistogramDialog(BuildContext context) async {
+  Future<void> showColumnDialog(BuildContext context) async {
     Size size = MediaQuery.of(context).size;
 
     return showDialog<void>(
@@ -17,13 +18,13 @@ class HistogramDialog {
         builder: (BuildContext context) {
           return AlertDialog(
             backgroundColor: Colors.transparent,
-            content: _histogramContainer(size),
+            content: _columnContainer(size),
             elevation: 24,
           );
         });
   }
 
-  Widget _histogramContainer(Size size) {
+  Widget _columnContainer(Size size) {
     return Container(
       height: size.height * 0.85,
       width: size.width * 0.9,
@@ -38,35 +39,32 @@ class HistogramDialog {
         borderRadius: BorderRadius.circular(25),
         color: const Color.fromARGB(255, 152, 214, 223),
       ),
-      child: _histogram(size),
+      child: _column(size),
     );
   }
 
-  Widget _histogram(Size size) {
-    List<double> axisY = controller.histogramData;
+  Widget _column(Size size) {
+    List<Data> axis = controller.dataList;
     List<ChartData> chartData = [];
-    chartData.add(ChartData(
-      0,
-      0,
-    ));
-    for (int i = 0; i < axisY.length; i++) {
+    for (int i = 0; i < axis.length; i++) {
       chartData.add(ChartData(
-        controller.dataList[i].li1!,
-        axisY[i],
-      ));
+          axis[i].xi!,
+          axis[i].ni,
+          Color.fromRGBO(Random().nextInt(250), Random().nextInt(250),
+              Random().nextInt(250), 1)));
     }
-    chartData.add(ChartData(controller.dataList.last.li!, axisY.last));
 
     return SizedBox(
       height: size.height * 0.6,
       width: size.width * 0.7,
       child: SfCartesianChart(
         series: <ChartSeries>[
-          StepAreaSeries<ChartData, double>(
+          ColumnSeries<ChartData, double>(
               dataSource: chartData,
               sortFieldValueMapper: (data, _) => data.x,
               yValueMapper: (data, int i) => data.y,
               xValueMapper: (data, _) => data.x,
+              pointColorMapper: (data, _) => data.color,
               dataLabelMapper: (data, _) =>
                   '${data.x.toStringAsFixed(2)}, ${data.y.toStringAsFixed(2)}',
               dataLabelSettings: DataLabelSettings(
@@ -76,11 +74,10 @@ class HistogramDialog {
                   borderWidth: size.aspectRatio,
                   labelPosition: ChartDataLabelPosition.outside,
                   labelAlignment: ChartDataLabelAlignment.top),
-              borderDrawMode: BorderDrawMode.all,
               borderColor: Colors.black,
               xAxisName: 'Intervalos',
               yAxisName: 'Frecuencias',
-              animationDuration: 3500,
+              animationDuration: 3000,
               color: barColor,
               borderWidth: 3),
         ],
@@ -90,7 +87,8 @@ class HistogramDialog {
 }
 
 class ChartData {
-  ChartData(this.x, this.y);
+  ChartData(this.x, this.y, this.color);
   final double y;
   final double x;
+  final Color color;
 }

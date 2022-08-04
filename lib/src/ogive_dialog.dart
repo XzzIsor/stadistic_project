@@ -40,10 +40,18 @@ class OgiveDialog {
   }
 
   Widget _ogive(Size size) {
-    List<double> axisX = controller.dataList.map((e) => e.li1!).toList();
-    axisX.add(controller.dataList.last.li!);
-    List<double> axisY = controller.ogiveData;
-    axisY.add(100);
+    List<double> axisX = [];
+    List<double> axisY = [];
+    if (controller.isDiscrete) {
+      axisX = controller.dataList.map((e) => e.xi!).toList();
+      axisY = controller.ogiveData;
+    } else {
+      axisX = controller.dataList.map((e) => e.li1!).toList();
+      axisX.add(controller.dataList.last.li!);
+      axisY = controller.ogiveData;
+      axisY.add(100);
+    }
+
     List<ChartData> data = [];
     data.add(ChartData(
         0,
@@ -72,6 +80,15 @@ class OgiveDialog {
               yValueMapper: (data, _) => data.y,
               xValueMapper: (data, _) => data.x,
               pointColorMapper: (data, _) => data.color,
+              dataLabelMapper: (data, _) =>
+                  '${data.x.toStringAsFixed(2)}, ${data.x.toStringAsFixed(2)}',
+              dataLabelSettings: DataLabelSettings(
+                  isVisible: true,
+                  borderColor: Colors.black,
+                  borderWidth: size.aspectRatio,
+                  useSeriesColor: true,
+                  labelPosition: ChartDataLabelPosition.outside,
+                  labelAlignment: ChartDataLabelAlignment.top),
               xAxisName: 'Intervalos',
               yAxisName: 'Frecuencias',
               animationDuration: 4000,

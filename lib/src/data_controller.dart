@@ -21,8 +21,13 @@ class DataController {
   static double _coefficientOfVariation = 0;
   static List<double> _ogiveData = [];
   static List<double> _frecuencyData = [];
+  static List<double> _histogramData = [];
   static List<double> _intervals = [];
   static List<double> _differentCValues = [];
+  double _tcheInterval1 = 0;
+  double _tcheInterval2 = 0;
+  double _tcheValue1 = 0;
+  double _tcheValue2 = 0;
   String _dataString = '';
   String cValuesString = '';
 
@@ -42,6 +47,7 @@ class DataController {
   List<double> get ogiveData => _ogiveData;
   List<double> get frecuencyData => _frecuencyData;
   List<double> get data => _data;
+  List<double> get histogramData => _histogramData;
 
   double get aritmeticMean => _aritmeticMean;
   double get median => _median;
@@ -51,6 +57,10 @@ class DataController {
   double get coefficientOfVariation => _coefficientOfVariation;
   double get cValue => _cValue;
   double get m => _m;
+  double get tcheValue1 => _tcheValue1;
+  double get tcheValue2 => _tcheValue2;
+  double get tcheInterval1 => _tcheInterval1;
+  double get tcheInterval2 => _tcheInterval2;
   bool get isDiscrete => _isDiscrete;
 
   void makeData() {
@@ -84,9 +94,9 @@ class DataController {
   void _makeDifferentCValue() {
     _differentCValues.clear();
     List<String> list = cValuesString.split(',');
-    list.forEach((element) {
+    for (var element in list) {
       _differentCValues.add(double.parse(element));
-    });
+    }
   }
 
   void _organizeDifferentCData() {
@@ -227,6 +237,7 @@ class DataController {
       if (i == 0) {
         data = Data(
             li: _intervals[i],
+            li1: _intervals[i],
             xi: _intervals[i],
             ni: counter,
             fi: counter / _lenghtN,
@@ -236,6 +247,7 @@ class DataController {
       } else {
         data = Data(
             li: _intervals[i],
+            li1: _intervals[i],
             xi: _intervals[i],
             ni: counter,
             fi: counter / _lenghtN,
@@ -405,6 +417,11 @@ class DataController {
       }
     }
 
+    _tcheInterval1 = valueMin;
+    _tcheInterval2 = valueMax;
+    _tcheValue1 = operation1;
+    _tcheValue2 = operation2;
+
     result = operation2 - operation1;
 
     return result;
@@ -413,6 +430,7 @@ class DataController {
   void _getGraphicsData() {
     _ogiveData.clear();
     _frecuencyData.clear();
+    _histogramData.clear();
     for (var element in _dataList) {
       _ogiveData.add(element.Fi! * 100);
     }
@@ -420,10 +438,12 @@ class DataController {
     if (cValuesString == '') {
       for (var element in dataList) {
         _frecuencyData.add(element.fi * 100);
+        _histogramData.add(element.fi * 100);
       }
     } else {
       for (int i = 0; i < dataList.length; i++) {
         _frecuencyData.add((dataList[i].fi / _differentCValues[i]) * 100);
+        _histogramData.add((dataList[i].fi / _differentCValues[i]) * 100);
       }
     }
   }

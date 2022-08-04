@@ -17,6 +17,9 @@ class _MainPageState extends State<MainPage> {
   String data = '';
   DataController controller = DataController();
   String errorMessage = '';
+  String graphicMessage = 'D. Barras';
+  String graphicMessage2 = 'D. Circular';
+  String graphicMessage3 = '';
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Center(
         child: Container(
-          padding: EdgeInsets.all(size.aspectRatio * 11),
+          padding: EdgeInsets.all(size.aspectRatio * 12),
           decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
@@ -52,11 +55,11 @@ class _MainPageState extends State<MainPage> {
               )),
           height: size.height * 0.85,
           width: size.width * 0.9,
-          child: Column(
+          child: ListView(
             children: [
               _columnCheckBoxes(size),
               SizedBox(
-                height: size.height * 0.04,
+                height: size.height * 0.03,
               ),
               _dataTextField(size),
               SizedBox(
@@ -90,7 +93,7 @@ class _MainPageState extends State<MainPage> {
       children: [
         Text('Ingrese los datos:',
             style: TextStyle(
-                color: Colors.black, fontSize: size.aspectRatio * 12)),
+                color: Colors.black, fontSize: size.aspectRatio * 11)),
         SizedBox(
           height: size.height * 0.02,
         ),
@@ -123,7 +126,7 @@ class _MainPageState extends State<MainPage> {
 
   Widget _columnCheckBoxes(Size size) {
     return SizedBox(
-      height: size.height * 0.1,
+      height: size.height * 0.2,
       child: Column(
         children: [
           Text(
@@ -145,6 +148,9 @@ class _MainPageState extends State<MainPage> {
                       showCheck = false;
                       isDiscretCheck = true;
                       isContinuesCheck = false;
+                      graphicMessage = 'D. Barras';
+                      graphicMessage2 = 'D. Circular';
+                      graphicMessage3 = '';
                     });
                   }),
               SizedBox(width: size.width * 0.005),
@@ -156,7 +162,7 @@ class _MainPageState extends State<MainPage> {
             ],
           ),
           SizedBox(
-            width: size.width * 0.05,
+            height: size.height * 0.01,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -168,6 +174,9 @@ class _MainPageState extends State<MainPage> {
                       showCheck = true;
                       isDiscretCheck = false;
                       isContinuesCheck = true;
+                      graphicMessage = 'Histograma - P. Frecuencias';
+                      graphicMessage2 = 'Ojiva';
+                      graphicMessage3 = 'Principio de Tchebycheff';
                     });
                   }),
               SizedBox(width: size.width * 0.005),
@@ -184,39 +193,41 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _button(Size size) {
-    return ElevatedButton(
-        onPressed: () {
-          controller.dataString = data;
-          controller.isDiscrete = isDiscretCheck;
+    return SizedBox(
+      child: ElevatedButton(
+          onPressed: () {
+            controller.dataString = data;
+            controller.isDiscrete = isDiscretCheck;
 
-          if (!cValues) {
-            try {
+            if (!cValues) {
+              try {
+                controller.makeData();
+                Navigator.pushNamed(context, '/result');
+              } catch (e) {
+                setState(() {
+                  errorMessage =
+                      'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
+                });
+              }
+            } else {
               controller.makeData();
-              Navigator.pushNamed(context, '/result');
-            } catch (e) {
-              setState(() {
-                errorMessage =
-                    'Datos erroneos o mal ingresados. Recuerde que deben ingresarse al menos 3 datos no repetidos y separados por comas';
-              });
+              CValuesDialog().showCValuesDialog(context);
             }
-          } else {
-            controller.makeData();
-            CValuesDialog().showCValuesDialog(context);
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(size.aspectRatio * 12),
-          elevation: size.aspectRatio * 5,
-          primary: const Color.fromARGB(255, 38, 159, 175),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+          },
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(size.aspectRatio * 12),
+            elevation: size.aspectRatio * 5,
+            primary: const Color.fromARGB(255, 38, 159, 175),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
-        ),
-        child: Text(
-          'Calcular',
-          style:
-              TextStyle(color: Colors.white, fontSize: size.aspectRatio * 15),
-        ));
+          child: Text(
+            'Calcular',
+            style:
+                TextStyle(color: Colors.white, fontSize: size.aspectRatio * 15),
+          )),
+    );
   }
 
   Widget _cValuesCheckBox(Size size) {
@@ -248,7 +259,7 @@ class _MainPageState extends State<MainPage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Text(
-            'Cálculos: ',
+            'Cálculos a Realizar: ',
             style:
                 TextStyle(color: Colors.black, fontSize: size.aspectRatio * 12),
           ),
@@ -299,17 +310,17 @@ class _MainPageState extends State<MainPage> {
               Column(
                 children: [
                   Text(
-                    'Histograma',
+                    graphicMessage,
                     style: TextStyle(
                         color: Colors.black, fontSize: size.aspectRatio * 10),
                   ),
                   Text(
-                    'Ojiva',
+                    graphicMessage2,
                     style: TextStyle(
                         color: Colors.black, fontSize: size.aspectRatio * 10),
                   ),
                   Text(
-                    'Principio de Tchebycheff',
+                    graphicMessage3,
                     style: TextStyle(
                         color: Colors.black, fontSize: size.aspectRatio * 10),
                   ),

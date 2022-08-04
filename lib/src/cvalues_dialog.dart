@@ -3,27 +3,40 @@ import 'package:flutter/material.dart';
 import 'data_controller.dart';
 
 class CValuesDialog {
-  DataController controller = DataController();
-  String cValues = '';
-
   Future<void> showCValuesDialog(BuildContext context) async {
     Size size = MediaQuery.of(context).size;
 
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
+          return const AlertDialog(
             backgroundColor: Colors.transparent,
-            content: cValuesContainer(size, context),
+            content: ValuesContainer(),
             elevation: 24,
           );
         });
   }
+}
 
-  Widget cValuesContainer(Size size, BuildContext context) {
+class ValuesContainer extends StatefulWidget {
+  const ValuesContainer({Key? key}) : super(key: key);
+
+  @override
+  State<ValuesContainer> createState() => _ValuesContainerState();
+}
+
+class _ValuesContainerState extends State<ValuesContainer> {
+  DataController controller = DataController();
+
+  String cValues = '';
+  String message = '';
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
         padding: EdgeInsets.all(size.aspectRatio * 15),
-        height: size.height * 0.3,
+        height: size.height * 0.45,
         width: size.width * 0.45,
         decoration: BoxDecoration(
             boxShadow: [
@@ -48,7 +61,14 @@ class CValuesDialog {
             SizedBox(
               height: size.height * 0.02,
             ),
-            _button(size, context)
+            _button(size, context),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Text(message,
+                style: TextStyle(
+                    color: const Color.fromARGB(255, 155, 26, 17),
+                    fontSize: size.aspectRatio * 8)),
           ],
         ));
   }
@@ -88,9 +108,22 @@ class CValuesDialog {
   Widget _button(Size size, BuildContext context) {
     return ElevatedButton(
         onPressed: () {
-          controller.cValuesString = cValues;
-          controller.makeDataForDifferentCValues();
-          Navigator.pushNamed(context, '/result');
+          List<String> num = cValues.split(',');
+          if (num.length != controller.m) {
+            setState(() {
+              message = 'Se deben ingresar ${controller.m} amplitudes';
+            });
+          } else {
+            try {
+              controller.cValuesString = cValues;
+              controller.makeDataForDifferentCValues();
+              Navigator.pushNamed(context, '/result');
+            } catch (e) {
+              setState(() {
+                message = 'No ingresar letras. Deben estar separados por comas';
+              });
+            }
+          }
         },
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.all(size.aspectRatio * 12),

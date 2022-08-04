@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:stadistic/src/circular_dialog.dart';
+import 'package:stadistic/src/column_dialog.dart';
 
 import 'package:stadistic/src/data.dart';
 import 'package:stadistic/src/data_controller.dart';
@@ -19,7 +21,10 @@ class _ResultPageState extends State<ResultPage> {
   DataController controller = DataController();
   List<TableRow> rows = [];
   List<Data> dataRows = [];
-  String messageTche = '';
+  String messageTcheResult = '';
+  String messageTche1 = '';
+  String messageTche2 = '';
+  String messageTche3 = '';
   @override
   void initState() {
     dataRows = controller.dataList;
@@ -87,7 +92,9 @@ class _ResultPageState extends State<ResultPage> {
               SizedBox(
                 height: size.height * 0.03,
               ),
-              _buttonsRow(size),
+              controller.isDiscrete
+                  ? _buttonsRowDiscrete(size)
+                  : _buttonsRow(size),
               SizedBox(
                 height: size.height * 0.07,
               ),
@@ -129,7 +136,6 @@ class _ResultPageState extends State<ResultPage> {
         : TableRow(children: [
             _row(size, '#', number),
             _row(size, 'Xi', number),
-            _row(size, 'ci', number),
             _row(size, 'ni', number),
             _row(size, 'fi', number),
             _row(size, 'Ni', number),
@@ -154,7 +160,6 @@ class _ResultPageState extends State<ResultPage> {
         : TableRow(children: [
             _row(size, '$index', number),
             _row(size, data.li!.toStringAsFixed(2), number),
-            _row(size, data.ci.toStringAsFixed(2), number),
             _row(size, data.ni.toStringAsFixed(2), number),
             _row(size, data.fi.toStringAsFixed(2), number),
             _row(size, data.Ni!.toStringAsFixed(2), number),
@@ -260,7 +265,7 @@ class _ResultPageState extends State<ResultPage> {
         child: Text(
           message,
           style:
-              TextStyle(color: Colors.white, fontSize: size.aspectRatio * 15),
+              TextStyle(color: Colors.white, fontSize: size.aspectRatio * 12),
         ));
   }
 
@@ -285,11 +290,29 @@ class _ResultPageState extends State<ResultPage> {
     ));
   }
 
+  Widget _buttonsRowDiscrete(Size size) {
+    return Center(
+        child: SizedBox(
+      width: size.width * 0.4,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _dialogButton(size, 'Barras', () {
+            ColumnDialog().showColumnDialog(context);
+          }),
+          _dialogButton(size, 'Circular', () {
+            CircularDialog().showColumnDialog(context);
+          }),
+        ],
+      ),
+    ));
+  }
+
   Widget _tchebycheff(Size size) {
     String kValue = '0';
     return Center(
       child: SizedBox(
-        height: size.height * 0.15,
+        height: size.height * 0.35,
         child: Column(
           children: [
             Text('Principio de Tchebycheff',
@@ -334,7 +357,12 @@ class _ResultPageState extends State<ResultPage> {
                       double result = 1 - (1 / divisor);
                       double response =
                           controller.getTchebycheff(int.parse(kValue));
-                      messageTche =
+                      messageTche3 = 'Traza';
+                      messageTche1 =
+                          'P8(${controller.tcheInterval1.toStringAsFixed(2)}) =< X =< P(${controller.tcheInterval2.toStringAsFixed(2)})';
+                      messageTche2 =
+                          '${controller.tcheValue2.toStringAsFixed(3)} - ${controller.tcheValue1.toStringAsFixed(3)} >= ${result.toStringAsFixed(2)}';
+                      messageTcheResult =
                           'El resultado es: ${response.toStringAsFixed(2)} >= ${result.toStringAsFixed(2)}';
                     });
                   },
@@ -357,7 +385,31 @@ class _ResultPageState extends State<ResultPage> {
               height: size.height * 0.02,
             ),
             Center(
-              child: Text(messageTche,
+              child: Text(messageTche3,
+                  style: TextStyle(
+                      fontSize: size.aspectRatio * 10, color: Colors.black)),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Center(
+              child: Text(messageTche1,
+                  style: TextStyle(
+                      fontSize: size.aspectRatio * 10, color: Colors.black)),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Center(
+              child: Text(messageTche2,
+                  style: TextStyle(
+                      fontSize: size.aspectRatio * 10, color: Colors.black)),
+            ),
+            SizedBox(
+              height: size.height * 0.01,
+            ),
+            Center(
+              child: Text(messageTcheResult,
                   style: TextStyle(
                       fontSize: size.aspectRatio * 10, color: Colors.black)),
             ),

@@ -6,8 +6,6 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 class FrecuencyDialog {
   DataController controller = DataController();
-  Color barColor = Color.fromRGBO(
-      Random().nextInt(250), Random().nextInt(250), Random().nextInt(250), 1);
   Future<void> showFrecuencyDialog(BuildContext context) async {
     Size size = MediaQuery.of(context).size;
 
@@ -42,10 +40,17 @@ class FrecuencyDialog {
   }
 
   Widget _frecuency(Size size) {
-    List<double> axisX = controller.dataList.map((e) => e.li1!).toList();
-    axisX.add(controller.dataList.last.li!);
-    List<double> axisY = controller.frecuencyData;
-    axisY.add(0);
+    List<double> axisX = [];
+    List<double> axisY = [];
+    if (controller.isDiscrete) {
+      axisX = controller.dataList.map((e) => e.xi!).toList();
+      axisY = controller.frecuencyData;
+    } else {
+      axisX = controller.dataList.map((e) => e.li1!).toList();
+      axisX.add(controller.dataList.last.li!);
+      axisY = controller.frecuencyData;
+      axisY.add(0);
+    }
     List<ChartData> data = [];
     data.add(ChartData(
         0,
@@ -74,6 +79,15 @@ class FrecuencyDialog {
               yValueMapper: (data, _) => data.y,
               xValueMapper: (data, _) => data.x,
               pointColorMapper: (data, _) => data.color,
+              dataLabelMapper: (data, _) =>
+                  '${data.x.toStringAsFixed(2)}, ${data.x.toStringAsFixed(2)}',
+              dataLabelSettings: DataLabelSettings(
+                  isVisible: true,
+                  useSeriesColor: true,
+                  borderColor: Colors.black,
+                  borderWidth: size.aspectRatio,
+                  labelPosition: ChartDataLabelPosition.outside,
+                  labelAlignment: ChartDataLabelAlignment.top),
               xAxisName: 'Intervalos',
               yAxisName: 'Frecuencias',
               animationDuration: 4000,
